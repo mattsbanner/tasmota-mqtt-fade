@@ -1,0 +1,48 @@
+name: Build
+
+# Run on all branches to try and catch build failures before merging.
+# Publish steps only run on main branch.
+on:
+  push:
+    branches:
+
+jobs:
+  pint:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v2
+
+      - name: Run Laravel Pint
+        run: vendor/bin/pint --test
+
+  docker:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: |
+          docker build --no-cache \
+          --tag ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:latest \
+          .
+
+      - name: Login to GitHub container registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        if: github.ref == 'refs/heads/main'
+
+      - name: Push image to GitHub container registry
+        run: docker push ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:latest
+        if: github.ref == 'refs/heads/main'
