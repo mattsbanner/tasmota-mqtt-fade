@@ -18,4 +18,4 @@ COPY fade.php .
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 COPY --from=composer /app/vendor/ vendor/
 
-CMD ["exec", "/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
