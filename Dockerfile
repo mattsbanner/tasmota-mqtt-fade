@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y supervisor
 WORKDIR /app
 
 COPY fade.php .
+COPY src .
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 COPY --from=composer /app/vendor/ vendor/
 
